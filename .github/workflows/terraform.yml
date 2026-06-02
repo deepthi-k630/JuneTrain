@@ -13,7 +13,7 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
-  TF_VERSION: 1.6.0
+  TF_VERSION: 1.15.5
 
 jobs:
   terraform:
@@ -36,6 +36,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Display configured AWS region
       run: aws sts get-caller-identity
@@ -47,4 +48,4 @@ jobs:
       run: terraform plan -var-file="dev.tfvars"
 
     - name: Step 6 - Terraform Apply
-      run: terraform apply -var-file="dev.tfvars" -auto-approve tfplan
+      run: terraform apply -var-file="dev.tfvars" -auto-approve
