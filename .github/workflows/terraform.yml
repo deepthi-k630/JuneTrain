@@ -1,51 +1,48 @@
 name: Terraform AWS Deployment
 
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: [ main ]
-    paths:
-      - 'terraform/**'
-      - '.github/workflows/terraform.yml'
+    branches: ["master"]
   pull_request:
-    branches: [ main ]
-    paths:
-      - 'terraform/**'
+    branches: ["master"]
 
-env:
-  AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
-  TF_VERSION: 1.15.5
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  terraform:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: terraform
 
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
 
-    - name: Step 1 - Install Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Step 2 - Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
 
-    - name: Display configured AWS region
-      run: aws sts get-caller-identity
+      - name: Verify AWS authentication
+        run: aws sts get-caller-identity
 
-    - name: Step 4 - Terraform Init 
-      run: terraform init --upgrade
+      - name: Terraform init
+        run: terraform init
 
-    - name: Step 5 - Terraform Plan
-      run: terraform plan -var-file="dev.tfvars"
+      - name: Terraform plan
+        run: terraform plan -var-file="dev.tfvars"
 
-    - name: Step 6 - Terraform Apply
-      run: terraform apply -var-file="dev.tfvars" -auto-approve
+      - name: Terraform apply
+        run: terraform apply -var-file="dev.tfvars" -auto-approve
