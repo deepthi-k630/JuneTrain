@@ -4,9 +4,9 @@ name: Terraform AWS Deployment
 on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: ["master"]
+    branches: ["main"]
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,20 +28,24 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.5
+          terraform_version: 1.15.5
 
       - name: Verify AWS authentication
         run: aws sts get-caller-identity
 
       - name: Terraform init
         run: terraform init
+        working-directory: ./terraform
 
       - name: Terraform plan
         run: terraform plan -var-file="dev.tfvars"
+        working-directory: ./terraform
 
       - name: Terraform apply
         run: terraform apply -var-file="dev.tfvars" -auto-approve
+        working-directory: ./terraform
