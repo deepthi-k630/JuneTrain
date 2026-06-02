@@ -36,29 +36,16 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
 
     - name: Display configured AWS region
       run: echo "AWS Region configured as ${{ env.AWS_REGION }}"
 
-    - name: Step 4 - Terraform Init
-      run: terraform init
-
+    - name: Step 4 - Terraform Init 
+      run: terraform init --upgrade
+      
     - name: Step 5 - Terraform Plan
       run: terraform plan -var-file="dev.tfvars" -out=tfplan
 
     - name: Step 6 - Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve tfplan
-
-    - name: Upload Terraform Plan
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: terraform-plan
-        path: terraform/tfplan
-        retention-days: 7
-
-    - name: Display Terraform Outputs
-      if: success()
-      run: terraform output
+      run: terraform apply -var-file="dev.tfvars" -auto-approve tfplan
