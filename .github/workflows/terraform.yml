@@ -38,14 +38,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: Display configured AWS region
-      run: echo "AWS Region configured as ${{ env.AWS_REGION }}"
+      run: aws sts get-caller-identity
 
     - name: Step 4 - Terraform Init 
       run: terraform init --upgrade
-      
+
     - name: Step 5 - Terraform Plan
-      run: terraform plan -var-file="dev.tfvars" -out=tfplan
+      run: terraform plan -var-file="dev.tfvars"
 
     - name: Step 6 - Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -var-file="dev.tfvars" -auto-approve tfplan
