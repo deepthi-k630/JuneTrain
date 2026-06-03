@@ -5,9 +5,9 @@ COPY HelloWebServer.java /app/
 RUN javac HelloWebServer.java
 
 # Runtime stage: use a smaller JRE image
-FROM eclipse-temurin:21-jre-jammy AS runtime
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=builder /app/*.class /app/
 
 EXPOSE 8080
-CMD ["java", "HelloWebServer"]
+CMD ["java", "-cp", "/app", "HelloWebServer"]
