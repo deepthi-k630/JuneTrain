@@ -1,0 +1,19 @@
+# 1. Create network
+docker network create app-network
+
+# 2. Start database
+docker run -d --name app-db --network app-network -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app_db -v "C:\Users\DELL\Documents\JuneTrain\Assessment\database\init.sql:/docker-entrypoint-initdb.d/init.sql" postgres:15-alpine
+
+# Wait 8 seconds...
+
+# 3. Build backend
+cd backend && docker build -t app-backend:latest . && cd ..
+
+# 4. Run backend
+docker run -d --name app-backend --network app-network -p 3000:3000 -e DB_HOST=app-db -e DB_PORT=5432 -e DB_USER=postgres -e DB_PASSWORD=postgres -e DB_NAME=app_db -e PORT=3000 app-backend:latest
+
+# 5. Build frontend
+cd frontend && docker build -t app-frontend:latest . && cd ..
+
+# 6. Run frontend
+docker run -d --name app-frontend --network app-network -p 8000:8000 app-frontend:latest

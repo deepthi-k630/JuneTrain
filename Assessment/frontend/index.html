@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-item.completed span {
+            text-decoration: line-through;
+        }
+
+        .todo-text {
+            flex: 1;
+        }
+
+        .todo-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-complete {
+            background: #2196F3;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-complete:hover {
+            background: #0b7dda;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Todo List</h1>
+        
+        <div class="input-group">
+            <input type="text" id="todoInput" placeholder="Enter a new task..." />
+            <button onclick="addTodo()">Add</button>
+        </div>
+
+        <ul class="todo-list" id="todoList">
+            <div class="empty-message">No todos yet. Add one!</div>
+        </ul>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Load todos on page load
+        loadTodos();
+
+        function loadTodos() {
+            fetch(`${API_URL}/todos`)
+                .then(res => res.json())
+                .then(todos => {
+                    const todoList = document.getElementById('todoList');
+                    if (todos.length === 0) {
+                        todoList.innerHTML = '<div class="empty-message">No todos yet. Add one!</div>';
+                    } else {
+                        todoList.innerHTML = todos.map(todo => `
+                            <li class="todo-item ${todo.completed ? 'completed' : ''}">
+                                <span class="todo-text">${todo.title}</span>
+                                <div class="todo-buttons">
+                                    <button class="btn-complete" onclick="toggleTodo(${todo.id})">${todo.completed ? 'Undo' : 'Done'}</button>
+                                    <button class="btn-delete" onclick="deleteTodo(${todo.id})">Delete</button>
+                                </div>
+                            </li>
+                        `).join('');
+                    }
+                })
+                .catch(err => console.error('Error loading todos:', err));
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const title = input.value.trim();
+            
+            if (!title) {
+                alert('Please enter a task');
+                return;
+            }
+
+            fetch(`${API_URL}/todos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, completed: false })
+            })
+            .then(res => res.json())
+            .then(() => {
+                input.value = '';
+                loadTodos();
+            })
+            .catch(err => console.error('Error adding todo:', err));
+        }
+
+        function toggleTodo(id) {
+            fetch(`${API_URL}/todos/${id}/toggle`, { method: 'PUT' })
+                .then(res => res.json())
+                .then(() => loadTodos())
+                .catch(err => console.error('Error toggling todo:', err));
+        }
+
+        function deleteTodo(id) {
+            fetch(`${API_URL}/todos/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => loadTodos())
+                .catch(err => console.error('Error deleting todo:', err));
+        }
+
+        // Allow Enter key to add todo
+        document.getElementById('todoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo();
+        });
+    </script>
+</body>
+</html>
