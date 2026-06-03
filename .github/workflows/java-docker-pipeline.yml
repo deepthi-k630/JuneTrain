@@ -19,9 +19,8 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Docker image
-      run: docker build -t javawebserver:latest .
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest .
       working-directory: ./JavaDocker
 
     - name: Push to Docker Hub
       run: docker push ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
-      working-directory: ./JavaDocker
