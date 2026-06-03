@@ -29,3 +29,9 @@ jobs:
 
     - name: Push to Docker Hub
       run: docker push ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
+
+    - name: Run Docker container
+      run: docker run -d -p 8080:8080 --name javawebserver ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
+
+    - name: Check running container
+      run: docker ps -a
