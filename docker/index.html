@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sample HTML - index.html</title>
+    <style>
+        :root {
+            --bg: #f7f9fc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --accent: #2563eb;
+            --muted: #6b7280;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        header {
+            background: linear-gradient(90deg, rgba(37,99,235,0.1), transparent);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(15,23,42,0.04);
+        }
+        .container {
+            max-width: 920px;
+            margin: 1.25rem auto;
+            padding: 0 1rem;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 18px rgba(12,16,23,0.04);
+            margin-top: 1rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        @media (min-width: 700px) {
+            .grid { grid-template-columns: 1fr 320px; align-items: start; }
+        }
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            padding: 2rem 0;
+        }
+        pre {
+            background: #0b1220;
+            color: #d1e8ff;
+            padding: 0.75rem;
+            border-radius: 8px;
+            overflow: auto;
+            font-size: 0.85rem;
+        }
+        .meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Sample HTML Page</h1>
+            <div class="subtitle">A minimal, responsive starter page (index.html)</div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="grid">
+            <section class="card" aria-labelledby="intro">
+                <h2 id="intro" style="margin-top:0">Quick demo</h2>
+                <p class="subtitle">This file is a simple example you can use as a starting point for static sites or Docker containers that serve a static page.</p>
+
+                <div class="meta">
+                    <strong>Now:</strong>
+                    <div id="time">--</div>
+                </div>
+
+                <p style="margin-top:1rem">
+                    Actions:
+                    <button class="btn" id="refreshBtn">Refresh time</button>
+                    <button class="btn" id="darkBtn" style="background:#111827;margin-left:0.5rem">Toggle dark</button>
+                </p>
+
+                <h3 style="margin-top:1rem">Example usage</h3>
+                <pre>
+# serve with Python (local)
+python -m http.server 8000
+
+# serve with Docker (simple)
+docker run --rm -v "${PWD}":/usr/share/nginx/html:ro -p 8080:80 nginx
+                </pre>
+            </section>
+
+            <aside class="card" aria-labelledby="info">
+                <h3 id="info" style="margin-top:0">Info</h3>
+                <p class="subtitle">Small utilities and status</p>
+                <ul style="padding-left:1.1rem">
+                    <li>Responsive layout</li>
+                    <li>No external dependencies</li>
+                    <li>Works when opened from filesystem or served over HTTP</li>
+                </ul>
+                <p style="margin-top:0.75rem;color:var(--muted);font-size:0.9rem">Browser: <span id="ua"></span></p>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        Built with a minimal template • Copy or modify as needed
+    </footer>
+
+    <script>
+        // small interactive helpers
+        const timeEl = document.getElementById('time');
+        const uaEl = document.getElementById('ua');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const darkBtn = document.getElementById('darkBtn');
+
+        function updateTime() {
+            const now = new Date();
+            timeEl.textContent = now.toLocaleString();
+        }
+
+        refreshBtn.addEventListener('click', updateTime);
+
+        darkBtn.addEventListener('click', () => {
+            const root = document.documentElement;
+            const isDark = root.style.getPropertyValue('--bg') === '#0b1220';
+            if (isDark) {
+                root.style.setProperty('--bg', '#f7f9fc');
+                root.style.setProperty('--card', '#ffffff');
+                root.style.setProperty('--text', '#0f172a');
+            } else {
+                root.style.setProperty('--bg', '#0b1220');
+                root.style.setProperty('--card', '#071021');
+                root.style.setProperty('--text', '#e6eef9');
+            }
+        });
+
+        uaEl.textContent = navigator.userAgent;
+        updateTime();
+    </script>
+</body>
+</html>
