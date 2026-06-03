@@ -1,0 +1,25 @@
+name: Java Docker Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t javawebserver ./JavaDocker
+
+    - name: Run container
+      run: docker run -d -p 8080:8080 --name javawebserver javawebserver
+
+    - name: Check container status
+      run: docker ps
