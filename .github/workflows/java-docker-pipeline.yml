@@ -31,11 +31,11 @@ jobs:
           dockerfile: ./JavaDocker/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/Java-Docker:latest
-            ${{ secrets.DOCKER_USERNAME }}/Java-Docker:${{ github.run_number }}
+            ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
+            ${{ secrets.DOCKER_USERNAME }}/javawebserver:${{ github.run_number }}
 
       - name: Run Docker container on port 8080
-        run: docker run -d -p 8080:8080 --name javawebserver ${{ secrets.DOCKER_USERNAME }}/Java-Docker:latest
+        run: docker run -d -p 8080:8080 --name javawebserver ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
 
       - name: Show running containers
         run: docker ps
