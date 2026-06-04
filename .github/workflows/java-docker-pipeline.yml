@@ -1,31 +1,33 @@
-name: Build and Push to Docker Hub
+name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  build-and-run:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest ./JavaDocker
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Push to Docker Hub
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
-
-    - name: Run Docker container on port 8080
-      run: docker run -d -p 8080:8080 --name javawebserver ${{ secrets.DOCKER_USERNAME }}/javawebserver:latest
-
-    - name: Show running containers
-      run: docker ps
+      # ---------------- BACKEND IMAGE ----------------
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./JavaDocker
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/Java-Docker:${{ github.run_number }}
