@@ -3,7 +3,7 @@ name: Build and Push Docker Images
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
@@ -23,11 +23,19 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # ---------------- BACKEND IMAGE ----------------
+      # Build & Push Java Docker Image
       - name: Build & Push Backend
         uses: docker/build-push-action@v5
         with:
           context: ./JavaDocker
+          dockerfile: ./JavaDocker/Dockerfile
           push: true
           tags: |
+            ${{ secrets.DOCKER_USERNAME }}/Java-Docker:latest
             ${{ secrets.DOCKER_USERNAME }}/Java-Docker:${{ github.run_number }}
+
+      - name: Run Docker container on port 8080
+        run: docker run -d -p 8080:8080 --name javawebserver ${{ secrets.DOCKER_USERNAME }}/Java-Docker:latest
+
+      - name: Show running containers
+        run: docker ps
